@@ -1,0 +1,16 @@
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.exe
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.deps.json
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.runtimeconfig.json
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.runtimeconfig.dev.json
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.dll
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\ref\commercial_controller_cs.dll
+C:\Odyssey\Week3\commercial_controller_cs\bin\Debug\net5.0\commercial_controller_cs.pdb
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.csprojAssemblyReference.cache
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.AssemblyInfoInputs.cache
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.AssemblyInfo.cs
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.csproj.CoreCompileInputs.cache
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.dll
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\ref\commercial_controller_cs.dll
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.pdb
+C:\Odyssey\Week3\commercial_controller_cs\obj\Debug\net5.0\commercial_controller_cs.genruntimeconfig.cache
