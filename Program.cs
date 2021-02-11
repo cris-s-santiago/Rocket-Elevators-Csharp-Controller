@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections; 
 using System.Collections.Generic;
 
+
 namespace Commercial_Controller
-{    
+{   
     class Battery 
     {
         public int ID;
@@ -28,8 +28,7 @@ namespace Commercial_Controller
                 this.createBasementColumn(_amountOfBasements, _amountOfElevatorPerColumn);
                 _amountOfColumns --;
             }
-
-            _amountOfFloors = _amountOfFloors-_amountOfBasements;
+            
             this.createFloorRequestButtons(_amountOfFloors);
             this.createColumns(_amountOfColumns, _amountOfFloors, _amountOfElevatorPerColumn);            
         }
@@ -199,7 +198,6 @@ namespace Commercial_Controller
             Elevator elevator = this.findElevator(_requestedFloor, _direction);
             Console.WriteLine("- Selected Elevator: " + elevator.ID);
             elevator.floorRequestList.Add(_requestedFloor);
-            //elevator.floorRequestList.Add(1);
             elevator.sortFloorList();
             elevator.move();
 
@@ -435,7 +433,7 @@ namespace Commercial_Controller
             Battery battery1 = null;
             void createBattery()
             {
-                battery1 = new Battery(1, 4, "OnLine", 66, 6, 5);
+                battery1 = new Battery(1, 4, "OnLine", 60, 6, 5);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("*********** Creating the Battery ***********");
                 Console.ResetColor();
@@ -509,7 +507,7 @@ namespace Commercial_Controller
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("===========| Scenario 2 |===============");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Someone at RC wants to go to the 36th floor.");
+                Console.WriteLine("Someone at RC wants to go to the 36th floor");
                 Console.WriteLine("\n");
                 Console.WriteLine("Elevator C1 at RC going to the 21st floor (not yet departed)");
                 Console.WriteLine("Elevator C2 at 23rd floor going to the 28th floor");
@@ -615,7 +613,6 @@ namespace Commercial_Controller
 
                 battery1.columnsList[0].elevatorsList[0].status = "idle";
                 battery1.columnsList[0].elevatorsList[0].currentFloor = -4;
-                battery1.columnsList[0].elevatorsList[0].floorRequestList.Add(0);
 
                 battery1.columnsList[0].elevatorsList[1].status = "idle";
                 battery1.columnsList[0].elevatorsList[1].currentFloor = 1;
@@ -638,7 +635,7 @@ namespace Commercial_Controller
                 battery1.columnsList[0].requestElevator(-3, "up"); 
             }
             
-            //scenario1();
+            scenario1();
             //scenario2();
             //scenario3();
             //scenario4();
