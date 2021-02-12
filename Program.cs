@@ -33,9 +33,6 @@ namespace Commercial_Controller
             this.createColumns(_amountOfColumns, _amountOfFloors, _amountOfElevatorPerColumn);            
         }
 
-        int columnID = 1;
-        int floorRequestButtonID = 1;                
-
         public void createBasementColumn(int _amountOfBasements, int _amountOfElevatorPerColumn)
         {
            List<int> servedFloorsList = new List<int>();
@@ -47,15 +44,17 @@ namespace Commercial_Controller
               servedFloorsList.Add(floor);
               floor --;
            }
-            Column column = new Column(columnID, "online", _amountOfBasements, _amountOfElevatorPerColumn, servedFloorsList, true);
+            Column column = new Column(Buttons.columnID, "A", "online", _amountOfBasements, _amountOfElevatorPerColumn, servedFloorsList, true);
             this.columnsList.Add(column);
-            columnID ++;
+            Buttons.columnID ++;
         }
 
         public void createColumns(int _amountOfColumns, int _amountOfFloors, int _amountOfElevatorPerColumn)
         {
-            float FloorsPerColumn = (_amountOfFloors/_amountOfColumns);
-            int amountOfFloorsPerColumn = Convert.ToInt32(Math.Ceiling(FloorsPerColumn));            
+            List<String> columnNameList = new List<String>(new []{ "B", "C", "D" });
+            
+            float floorsPerColumn = (_amountOfFloors/_amountOfColumns);
+            int amountOfFloorsPerColumn = Convert.ToInt32(Math.Ceiling(floorsPerColumn));            
             int floor = 1;
              
             for(int i = 1; i <= _amountOfColumns; i++)
@@ -75,9 +74,9 @@ namespace Commercial_Controller
                     servedFloorsList.Add(1);
                 }
                 servedFloorsList.Sort((a, b) => a.CompareTo(b));
-                Column column = new Column(columnID, "online", amountOfFloorsPerColumn, _amountOfElevatorPerColumn, servedFloorsList, false); 
+                Column column = new Column(Buttons.columnID, columnNameList[i-1], "online", amountOfFloorsPerColumn, _amountOfElevatorPerColumn, servedFloorsList, false); 
                 this.columnsList.Add(column);
-                columnID ++;
+                Buttons.columnID ++;
             }   
             
         }
@@ -86,9 +85,9 @@ namespace Commercial_Controller
         {
            for(int buttonFloor = 1; buttonFloor <= _amountOfFloors; buttonFloor++)
            {
-              FloorRequestButton floorRequestButton = new FloorRequestButton(floorRequestButtonID, "off", buttonFloor, "up");
+              FloorRequestButton floorRequestButton = new FloorRequestButton(Buttons.floorRequestButtonID, "off", buttonFloor, "up");
               this.floorRequestButtonsList.Add(floorRequestButton);
-              floorRequestButtonID ++;
+              Buttons.floorRequestButtonID ++;
            }
         }
         
@@ -98,10 +97,10 @@ namespace Commercial_Controller
 
            for(int i = 1; i <= _amountOfBasements; i++)
            {
-              FloorRequestButton floorRequestButton = new FloorRequestButton(floorRequestButtonID, "off", buttonFloor, "down");
+              FloorRequestButton floorRequestButton = new FloorRequestButton(Buttons.floorRequestButtonID, "off", buttonFloor, "down");
               this.floorRequestButtonsList.Add(floorRequestButton);
               buttonFloor --;
-              floorRequestButtonID ++;
+              Buttons.floorRequestButtonID ++;
            }
         }
 
@@ -122,9 +121,9 @@ namespace Commercial_Controller
         public void assignElevator(int _requestedFloor, String _direction)
         {
             Column column = this.findBestColumn(_requestedFloor);
-            Console.WriteLine("- Selected Column: " + column.ID);
+            Console.WriteLine("- Selected Column: " + column.name);
             Elevator elevator = column.findElevator(1, _direction);
-            Console.WriteLine("- Selected Elevator: " + elevator.ID);
+            Console.WriteLine("- Selected Elevator: " + elevator.name);
             elevator.floorRequestList.Add(_requestedFloor);
             elevator.move();            
         }
@@ -134,20 +133,25 @@ namespace Commercial_Controller
     {
         public static int callButtonID = 1;
         public static int buttonFloor = 1;
+        public static int elevatorID = 1;
+        public static int columnID = 1;
+        public static int floorRequestButtonID = 1; 
     }
 
     class Column
     {
         public int ID;
+        public String name;
         public String status;
         public int amountOfElevators;
         public List<Elevator> elevatorsList = new List<Elevator>();
         public List<CallButton> callButtonList = new List<CallButton>();
         public List<int> servedFloors = new List<int>();
 
-        public Column(int _id, String _status, int _amountOfFloors, int _amountOfElevators, List<int> _servedFloors, Boolean _isBasement)
+        public Column(int _id, String _name, String _status, int _amountOfFloors, int _amountOfElevators, List<int> _servedFloors, Boolean _isBasement)
         {
             this.ID = _id;
+            this.name = _name;
             this.status = _status;
             this.amountOfElevators = _amountOfElevators;
             this.servedFloors = _servedFloors;
@@ -155,7 +159,7 @@ namespace Commercial_Controller
             this.createElevators(_amountOfFloors, _amountOfElevators);
             this.createCallButtons(_amountOfFloors, _isBasement);
         }
-        int elevatorID = 1;        
+               
 
         public void createCallButtons(int _amountOfFloors, Boolean _isBasement)
         {
@@ -186,17 +190,17 @@ namespace Commercial_Controller
         {            
             for(int i = 1; i <= _amountOfElevators; i ++)
             {
-                Elevator elevator = new Elevator(elevatorID, "idle", _amountOfFloors, 1);
+                Elevator elevator = new Elevator(Buttons.elevatorID, this.name + (i), "idle", _amountOfFloors, 1);
                 this.elevatorsList.Add(elevator);
-                elevatorID ++;
+                Buttons.elevatorID ++;
             }
         }
 
         public Elevator requestElevator(int _requestedFloor, String _direction)
         {        
-            Console.WriteLine("- Current column: " + this.ID);
+            Console.WriteLine("- Current column: " + this.name);
             Elevator elevator = this.findElevator(_requestedFloor, _direction);
-            Console.WriteLine("- Selected Elevator: " + elevator.ID);
+            Console.WriteLine("- Selected Elevator: " + elevator.name);
             elevator.floorRequestList.Add(_requestedFloor);
             elevator.sortFloorList();
             elevator.move();
@@ -208,49 +212,66 @@ namespace Commercial_Controller
         {
             BestElevatorInfo bestElevatorInfo = new BestElevatorInfo(null, 7, 10000000);
 
-            foreach(Elevator elevator in this.elevatorsList)            
+            if (_requestedFloor == 1)
             {
-                //The elevator is at the lobby and already has some requests. It is about to leave but has not yet departed
-                if(_requestedFloor == elevator.currentFloor && elevator.status == "stopped")
+                foreach(Elevator elevator in this.elevatorsList)
                 {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _requestedFloor);
+                    //The elevator is at the lobby and already has some requests. It is about to leave but has not yet departed
+                    if (_requestedFloor == elevator.currentFloor && elevator.status == "stopped")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _requestedFloor);
+                    }
+                    //The elevator is at the lobby and has no requests
+                    else if (_requestedFloor == elevator.currentFloor && elevator.status == "idle")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
+                        //The elevator is lower than me and is coming up. It means that I am requesting an elevator to go to a basement, and the elevator is on it's way to me.
+                    } else if (_requestedFloor > elevator.currentFloor && elevator.direction == "up")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
+                    }
+                    //The elevator is above me and is coming down. It means that I'm requesting an elevator to go to a floor, and the elevator is on it's way to me
+                    else if (_requestedFloor < elevator.currentFloor && elevator.direction == "down")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
+                    }//The elevator is not at the first floor, but doesn't have any request
+                    else if (elevator.status == "idle")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
+                    } //The elevator is not available, but still could take the call if nothing better is found
+                    else
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(5, elevator, bestElevatorInfo, _requestedFloor);
+                    }
                 }
-                //The elevator is at the lobby and has no requests
-                else if(_requestedFloor == elevator.currentFloor && elevator.status == "idle")
+            } else
+            {
+                foreach(Elevator elevator in this.elevatorsList)
                 {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                //The elevator is lower than me and is coming up. It means that I'm requesting an elevator to go to a basement, and the elevator is on it's way to me.
-                else if(_requestedFloor > elevator.currentFloor && elevator.direction == "up" && elevator.direction == _direction)
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                //The elevator is above me and is coming down. It means that I'm requesting an elevator to go to a floor, and the elevator is on it's way to me
-                else if(_requestedFloor < elevator.currentFloor && elevator.direction == "down" && elevator.direction == _direction)
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                else if(_requestedFloor > elevator.currentFloor && elevator.direction == "up")
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                //The elevator is above me and is coming down. It means that I'm requesting an elevator to go to a floor, and the elevator is on it's way to me
-                else if(_requestedFloor < elevator.currentFloor && elevator.direction == "down")
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                //The elevator is not at the first floor, but doesn't have any request
-                else if(elevator.status == "idle")
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(5, elevator, bestElevatorInfo, _requestedFloor);
-                }
-                //The elevator is not available, but still could take the call if nothing better is found
-                else
-                {
-                    bestElevatorInfo = this.checkIfElevatorISBetter(6, elevator, bestElevatorInfo, _requestedFloor);
-                }
+                    //The elevator is at the same level as me, and is about to depart to the first floor
+                    if (_requestedFloor == elevator.currentFloor && elevator.status == "stopped" && _direction == elevator.direction)
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _requestedFloor);
+                    }
+                    //The elevator is lower than me and is going up. I'm on a basement, and the elevator can pick me up on it's way
+                    else if (_requestedFloor > elevator.currentFloor && elevator.direction == "up" && _direction == "up")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
+                    } //The elevator is higher than me and is going down. I'm on a floor, and the elevator can pick me up on it's way
+                    else if (_requestedFloor < elevator.currentFloor && elevator.direction == "down" && _direction == "down")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
+                    }//The elevator is idle and has no requests
+                    else if (elevator.status == "idle")
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
+                    }//The elevator is not available, but still could take the call if nothing better is found
+                    else
+                    {
+                        bestElevatorInfo = checkIfElevatorISBetter(5, elevator, bestElevatorInfo, _requestedFloor);
+                    }
+                }        
             }
-
             return bestElevatorInfo.bestElevator;
         }
 
@@ -277,6 +298,7 @@ namespace Commercial_Controller
     class Elevator
     {
         public int ID;
+        public String name;
         public String status;
         public int amountOfFloors;
         public int currentFloor;
@@ -285,9 +307,10 @@ namespace Commercial_Controller
         public String direction;
         public int screenDisplay;
 
-        public Elevator(int _id, String _status, int _amountOfFloors, int _currentFloor)
+        public Elevator(int _id, String _name, String _status, int _amountOfFloors, int _currentFloor)
         {
             this.ID = _id;
+            this.name = _name;
             this.status = _status;
             this.amountOfFloors = _amountOfFloors;
             this.currentFloor = _currentFloor;
@@ -431,43 +454,45 @@ namespace Commercial_Controller
         static void Main(string[] args)
         {
             Battery battery1 = null;
+
+            scenario1();
+            scenario2();
+            scenario3();
+            scenario4();
+
+            //-------------------------------------"    Battery Initialization   "-------------------------------------
             void createBattery()
             {
                 battery1 = new Battery(1, 4, "OnLine", 60, 6, 5);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("*********** Creating the Battery ***********");
+                Console.WriteLine("=======================| Creating the Battery |=======================");
                 Console.ResetColor();
-                Console.WriteLine("New  Battery ID = " + battery1.ID + " || Status =  " + battery1.status + " || Number of Columns =  " + battery1.amountOfColumns + " || Number of Floors =  " + battery1.amountOfFloors);
+                Console.WriteLine("New  Battery ID = " + battery1.ID + " || Status =  " + battery1.status + " || Number of Columns =  " + battery1.amountOfColumns + " || Number of Floors =  " + battery1.amountOfFloors + " || Number of Basements =  " + battery1.amountOfBasements);
                 Console.WriteLine("\n");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("*********** Creating the columns ***********");
+                Console.WriteLine("==================| Creating the Columns |=======================");
                 Console.ResetColor();
                 foreach (Column column in battery1.columnsList)
                 {
-                    Console.WriteLine("Column: ID = " + column.ID + "  ||  " 
+                    Console.WriteLine("Column: " + column.name + "  ||  " 
                     + "Status: " + column.status 
                     + " || Floors served =  " + String.Join(", ", column.servedFloors));
                 }           
                 Console.WriteLine("\n");
             }
 
+            //-------------------------------------"    Scenario 1   "-------------------------------------
             void scenario1()
-            {
-                //=========== scenario1 ===============\\
+            {              
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("=============================================| Scenario 1 |=============================================");
+                Console.ForegroundColor = ConsoleColor.Yellow;                
+                Console.ResetColor();
+                Console.WriteLine("\n");
 
                 createBattery();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("===========| Scenario 1 |===============");
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                
                 Console.WriteLine("Someone at RC wants to go to the 20th floor");
-                Console.WriteLine("\n");
-                Console.WriteLine("Elevator B1 at 20th floor going to the 5th floor");
-                Console.WriteLine("Elevator B2 at 3rd floor going to the 15th floor");
-                Console.WriteLine("Elevator B3 at 13th floor going to RC");
-                Console.WriteLine("Elevator B4 at 15th floor going to the 2nd floor");
-                Console.WriteLine("Elevator B5 at 6th floor going to RC");
-                Console.ResetColor();
                 Console.WriteLine("\n");
 
                 battery1.columnsList[1].elevatorsList[0].direction = "down";
@@ -498,23 +523,18 @@ namespace Commercial_Controller
                 battery1.assignElevator(20, "up"); 
             }
 
+            //-------------------------------------"    Scenario 2   "-------------------------------------
             void scenario2()
             {
-                //=========== scenario2 ===============\\
-
-                createBattery();
-
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("===========| Scenario 2 |===============");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Someone at RC wants to go to the 36th floor");
-                Console.WriteLine("\n");
-                Console.WriteLine("Elevator C1 at RC going to the 21st floor (not yet departed)");
-                Console.WriteLine("Elevator C2 at 23rd floor going to the 28th floor");
-                Console.WriteLine("Elevator C3 at 33rd floor going to RC");
-                Console.WriteLine("Elevator C4 at 40th floor going to the 24th floor");
-                Console.WriteLine("Elevator C5 at 39th floor going to RC");
+                Console.WriteLine("=============================================| Scenario 2 |=============================================");
+                Console.ForegroundColor = ConsoleColor.Yellow;                
                 Console.ResetColor();
+                Console.WriteLine("\n");
+
+                createBattery(); 
+
+                Console.WriteLine("Someone at RC wants to go to the 36th floor");
                 Console.WriteLine("\n");
 
                 battery1.columnsList[2].elevatorsList[0].direction = "up";
@@ -535,7 +555,7 @@ namespace Commercial_Controller
                 battery1.columnsList[2].elevatorsList[3].direction = "down";
                 battery1.columnsList[2].elevatorsList[3].status = "moving";                
                 battery1.columnsList[2].elevatorsList[3].currentFloor = 40;
-                battery1.columnsList[3].elevatorsList[3].floorRequestList.Add(24);
+                battery1.columnsList[2].elevatorsList[3].floorRequestList.Add(24);
 
                 battery1.columnsList[2].elevatorsList[4].direction = "down";
                 battery1.columnsList[2].elevatorsList[4].status = "moving";                
@@ -545,23 +565,18 @@ namespace Commercial_Controller
                 battery1.assignElevator(36, "up"); 
             }
 
+            //-------------------------------------"    Scenario 3   "-------------------------------------
             void scenario3()
             {
-                //=========== scenario3 ===============\\
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("=============================================| Scenario 3 |=============================================");
+                Console.ForegroundColor = ConsoleColor.Yellow;                
+                Console.ResetColor();
+                Console.WriteLine("\n");
 
                 createBattery();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("===========| Scenario 3 |===============");
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                
                 Console.WriteLine("Someone at 54e floor wants to go to RC");
-                Console.WriteLine("\n");
-                Console.WriteLine("Elevator D1 at 58th going to RC");
-                Console.WriteLine("Elevator D2 at 50th floor going to the 60th floor");
-                Console.WriteLine("Elevator D3 at 46th floor going to the 58th floor");
-                Console.WriteLine("Elevator D4 at RC going to the 54th floor");
-                Console.WriteLine("Elevator D5 at 60th floor going to RC");
-                Console.ResetColor();
                 Console.WriteLine("\n");
 
                 battery1.columnsList[3].elevatorsList[0].direction = "down";
@@ -592,23 +607,18 @@ namespace Commercial_Controller
                 battery1.columnsList[3].requestElevator(54, "down"); 
             }
 
+            //-------------------------------------"    Scenario 4   "-------------------------------------
             void scenario4()
             {
-                //=========== scenario4 ===============\\
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("=============================================| Scenario 4 |=============================================");
+                Console.ForegroundColor = ConsoleColor.Yellow;                
+                Console.ResetColor();
+                Console.WriteLine("\n");
 
                 createBattery();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("===========| Scenario 4 |===============");
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                
                 Console.WriteLine("Someone at SS3 wants to go to RC");
-                Console.WriteLine("\n");
-                Console.WriteLine("Elevator A1 “Idle” at SS4");
-                Console.WriteLine("Elevator A2 “Idle” at RC");
-                Console.WriteLine("Elevator A3 at SS3 going to SS5");
-                Console.WriteLine("Elevator A4 at SS6 going to RC");
-                Console.WriteLine("Elevator A5 at SS1 going to SS6");
-                Console.ResetColor();
                 Console.WriteLine("\n");
 
                 battery1.columnsList[0].elevatorsList[0].status = "idle";
@@ -634,11 +644,6 @@ namespace Commercial_Controller
 
                 battery1.columnsList[0].requestElevator(-3, "up"); 
             }
-            
-            scenario1();
-            //scenario2();
-            //scenario3();
-            //scenario4();
         }      
     }
 }
