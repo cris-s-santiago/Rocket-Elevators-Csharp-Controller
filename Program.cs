@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Commercial_Controller
 {   
+    //-----------------------------------------------------"  Battery  "-----------------------------------------------------
     class Battery 
     {
         public int ID;
@@ -33,6 +34,7 @@ namespace Commercial_Controller
             this.createColumns(_amountOfColumns, _amountOfFloors, _amountOfElevatorPerColumn);            
         }
 
+        // Through this method, we create the Basement Column
         public void createBasementColumn(int _amountOfBasements, int _amountOfElevatorPerColumn)
         {
            List<int> servedFloorsList = new List<int>();
@@ -49,9 +51,10 @@ namespace Commercial_Controller
             Buttons.columnID ++;
         }
 
+        // Through this method, we create the outhers Columns
         public void createColumns(int _amountOfColumns, int _amountOfFloors, int _amountOfElevatorPerColumn)
         {
-            List<String> columnNameList = new List<String>(new []{ "B", "C", "D" });
+            List<String> columnNameList = new List<String>(new []{ "B", "C", "D" }); //Give the name for the each Column
             
             float floorsPerColumn = (_amountOfFloors/_amountOfColumns);
             int amountOfFloorsPerColumn = Convert.ToInt32(Math.Ceiling(floorsPerColumn));            
@@ -81,6 +84,7 @@ namespace Commercial_Controller
             
         }
 
+        // Through this method, we create the buttons that will be on the panel, except the basement's floors
         public void createFloorRequestButtons(int _amountOfFloors)
         {
            for(int buttonFloor = 1; buttonFloor <= _amountOfFloors; buttonFloor++)
@@ -91,6 +95,7 @@ namespace Commercial_Controller
            }
         }
         
+        // Through this method, we create the buttons that will be on the panel, just the basement's floors
         public void createBasementFloorRequestButtons(int _amountOfBasements)
         {
             int buttonFloor = -1;           
@@ -104,6 +109,7 @@ namespace Commercial_Controller
            }
         }
 
+        // Through this method, we will locating which column is capable of serving your floor
         public Column findBestColumn (int _requestedFloor)
         {
             Column foundColumn = null;
@@ -118,6 +124,7 @@ namespace Commercial_Controller
             return foundColumn;
         }
 
+        // Through this method, we will handling the demand for an elevator from the central panel
         public void assignElevator(int _requestedFloor, String _direction)
         {
             Column column = this.findBestColumn(_requestedFloor);
@@ -129,6 +136,7 @@ namespace Commercial_Controller
         }
     }
 
+    //-----------------------------------------------------"  Globals Variables "-----------------------------------------------------
     static class Buttons
     {
         public static int callButtonID = 1;
@@ -138,6 +146,7 @@ namespace Commercial_Controller
         public static int floorRequestButtonID = 1; 
     }
 
+    //-----------------------------------------------------"  Column  "-----------------------------------------------------
     class Column
     {
         public int ID;
@@ -158,9 +167,20 @@ namespace Commercial_Controller
 
             this.createElevators(_amountOfFloors, _amountOfElevators);
             this.createCallButtons(_amountOfFloors, _isBasement);
-        }
-               
+        }     
 
+        //Through this method we create the elevators
+        public void createElevators (int _amountOfFloors, int _amountOfElevators)
+        {            
+            for(int i = 1; i <= _amountOfElevators; i ++)
+            {
+                Elevator elevator = new Elevator(Buttons.elevatorID, this.name + (i), "idle", _amountOfFloors, 1);
+                this.elevatorsList.Add(elevator);
+                Buttons.elevatorID ++;
+            }
+        }
+
+        //Through this method we create the buttons floors
         public void createCallButtons(int _amountOfFloors, Boolean _isBasement)
         {
             if(_isBasement)
@@ -186,16 +206,7 @@ namespace Commercial_Controller
             }
         }
 
-        public void createElevators (int _amountOfFloors, int _amountOfElevators)
-        {            
-            for(int i = 1; i <= _amountOfElevators; i ++)
-            {
-                Elevator elevator = new Elevator(Buttons.elevatorID, this.name + (i), "idle", _amountOfFloors, 1);
-                this.elevatorsList.Add(elevator);
-                Buttons.elevatorID ++;
-            }
-        }
-
+        //Through this method we will handling the demand for an elevator from your current floor
         public Elevator requestElevator(int _requestedFloor, String _direction)
         {        
             Console.WriteLine("- Current column: " + this.name);
@@ -208,6 +219,7 @@ namespace Commercial_Controller
             return elevator;
         }
 
+        //Through this method we will score the best elevator, taking into account proximity, direction and its status
         public Elevator findElevator(int _requestedFloor, String _direction)
         {
             BestElevatorInfo bestElevatorInfo = new BestElevatorInfo(null, 7, 10000000);
@@ -216,25 +228,23 @@ namespace Commercial_Controller
             {
                 foreach(Elevator elevator in this.elevatorsList)
                 {
-                    //The elevator is at the lobby and already has some requests. It is about to leave but has not yet departed
+                     //The elevator is at the lobby and already has some requests. It is about to leave but has not yet departed
                     if (_requestedFloor == elevator.currentFloor && elevator.status == "stopped")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _requestedFloor);
-                    }
-                    //The elevator is at the lobby and has no requests
+                    } //The elevator is at the lobby and has no requests
                     else if (_requestedFloor == elevator.currentFloor && elevator.status == "idle")
                     {
-                        bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
-                        //The elevator is lower than me and is coming up. It means that I am requesting an elevator to go to a basement, and the elevator is on it's way to me.
-                    } else if (_requestedFloor > elevator.currentFloor && elevator.direction == "up")
+                        bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);                    
+                    } //The elevator is lower than me and is coming up. It means that I'm requesting an elevator to go to a basement, and the elevator is on it's way to me.
+                    else if (_requestedFloor > elevator.currentFloor && elevator.direction == "up")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
-                    }
-                    //The elevator is above me and is coming down. It means that I'm requesting an elevator to go to a floor, and the elevator is on it's way to me
+                    } //The elevator is above me and is coming down. It means that I'm requesting an elevator to go to a floor, and the elevator is on it's way to me
                     else if (_requestedFloor < elevator.currentFloor && elevator.direction == "down")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _requestedFloor);
-                    }//The elevator is not at the first floor, but doesn't have any request
+                    } //The elevator is not at the first floor, but doesn't have any request
                     else if (elevator.status == "idle")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
@@ -248,12 +258,11 @@ namespace Commercial_Controller
             {
                 foreach(Elevator elevator in this.elevatorsList)
                 {
-                    //The elevator is at the same level as me, and is about to depart to the first floor
+                     //The elevator is at the same level as me, and is about to depart to the first floor
                     if (_requestedFloor == elevator.currentFloor && elevator.status == "stopped" && _direction == elevator.direction)
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _requestedFloor);
-                    }
-                    //The elevator is lower than me and is going up. I'm on a basement, and the elevator can pick me up on it's way
+                    } //The elevator is lower than me and is going up. I'm on a basement, and the elevator can pick me up on it's way
                     else if (_requestedFloor > elevator.currentFloor && elevator.direction == "up" && _direction == "up")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
@@ -261,11 +270,11 @@ namespace Commercial_Controller
                     else if (_requestedFloor < elevator.currentFloor && elevator.direction == "down" && _direction == "down")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _requestedFloor);
-                    }//The elevator is idle and has no requests
+                    } //The elevator is idle and has no requests
                     else if (elevator.status == "idle")
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _requestedFloor);
-                    }//The elevator is not available, but still could take the call if nothing better is found
+                    } //The elevator is not available, but still could take the call if nothing better is found
                     else
                     {
                         bestElevatorInfo = checkIfElevatorISBetter(5, elevator, bestElevatorInfo, _requestedFloor);
@@ -275,6 +284,7 @@ namespace Commercial_Controller
             return bestElevatorInfo.bestElevator;
         }
 
+        //Through this method we will analyze the scores of the method above and select the best one
         public BestElevatorInfo checkIfElevatorISBetter(int scoreToCheck, Elevator newElevator, BestElevatorInfo bestElevatorInfo, int _requestedFloor){
             if(scoreToCheck < bestElevatorInfo.bestScore)
             {
@@ -295,6 +305,7 @@ namespace Commercial_Controller
         }
     }
 
+    //-----------------------------------------------------"  Elevator  "-----------------------------------------------------
     class Elevator
     {
         public int ID;
@@ -319,16 +330,18 @@ namespace Commercial_Controller
             this.screenDisplay = _currentFloor;
         }
 
+        //Through this sequence we can move the elevator
         public void move()
         {   
+            // Checks for requested floors in the list
             while(this.floorRequestList.Count != 0)
             {
                 int destination = this.floorRequestList[0];
                 this.operateDoors("closed");
-                if(this.door.status == "closed")
+                if(this.door.status == "closed")    // Check if the door dont' have any obstruction
                 {
                     Console.WriteLine("Status door:" + this.door.status + "\n");
-                    this.status = "moving";
+                    this.status = "moving";        //Changes the status of the elevator when it starts to move
                     this.screenDisplay = this.currentFloor;
                     Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
                     if(this.currentFloor < destination)
@@ -354,16 +367,17 @@ namespace Commercial_Controller
                             Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
                         }
                     }
-                    this.status = "stopped";
+                    this.status = "stopped";        //Changes the status of the elevator when it reaches the correct floor
                     Console.WriteLine("Elevator Status: " + this.status + "\n");
                     this.operateDoors("openned");
                     Console.WriteLine("Status door:" + this.door.status + "\n");
                 }
-                this.floorRequestList.RemoveAt(0);
+                this.floorRequestList.RemoveAt(0);      //Removes the floor that has already been treated.
             }
-            this.status = "idle";
+            this.status = "idle";      //Changes the status of the elevator when it finishes its list of floors to go
         }
 
+        //Through this sequence we can sort the list in ascending or descending order, according to the direction the elevator is going
         public void sortFloorList()
         {
             if (this.direction == "up"){
@@ -373,6 +387,7 @@ namespace Commercial_Controller
             }
         }
 
+        //Through this sequence we can verify that there is no obstruction in the door
         public void operateDoors(String _command)
         {
         var sensorDoor = false; // External data
@@ -386,6 +401,7 @@ namespace Commercial_Controller
     
     }
 
+    //-----------------------------------------------------"  CallButton  "-----------------------------------------------------
     class CallButton
     {
         public int ID;
@@ -407,6 +423,7 @@ namespace Commercial_Controller
 
     }
 
+    //-----------------------------------------------------"  FloorRequestButton  "-----------------------------------------------------
     class FloorRequestButton
     {
         public int ID;
@@ -423,6 +440,7 @@ namespace Commercial_Controller
         }
     }
 
+    //-----------------------------------------------------"  Door  "-----------------------------------------------------
     class Door
     {
         public int ID;
@@ -435,7 +453,8 @@ namespace Commercial_Controller
         }
     }
 
-    class BestElevatorInfo
+    //-----------------------------------------------------"  BestElevatorInfo  "-----------------------------------------------------
+    class BestElevatorInfo // Created to assist in findElevator method.
     {
         public Elevator bestElevator;
         public int bestScore;
@@ -449,6 +468,7 @@ namespace Commercial_Controller
         }
     }
 
+    //-----------------------------------------------------"  Tests  "-----------------------------------------------------
     class Program
     {        
         static void Main(string[] args)
