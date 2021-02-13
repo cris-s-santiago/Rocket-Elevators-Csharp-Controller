@@ -128,9 +128,9 @@ namespace Commercial_Controller
         public void assignElevator(int _requestedFloor, String _direction)
         {
             Column column = this.findBestColumn(_requestedFloor);
-            Console.WriteLine("- Selected Column: " + column.name);
+            //Console.WriteLine("- Selected Column: " + column.name);
             Elevator elevator = column.findElevator(1, _direction);
-            Console.WriteLine("- Selected Elevator: " + elevator.name);
+            //Console.WriteLine("- Selected Elevator: " + elevator.name);
             elevator.floorRequestList.Add(_requestedFloor);
             elevator.move();            
         }
@@ -209,9 +209,9 @@ namespace Commercial_Controller
         //Through this method we will handling the demand for an elevator from your current floor
         public Elevator requestElevator(int _requestedFloor, String _direction)
         {        
-            Console.WriteLine("- Current column: " + this.name);
+            //Console.WriteLine("- Current column: " + this.name);
             Elevator elevator = this.findElevator(_requestedFloor, _direction);
-            Console.WriteLine("- Selected Elevator: " + elevator.name);
+            //Console.WriteLine("- Selected Elevator: " + elevator.name);
             elevator.floorRequestList.Add(_requestedFloor);
             elevator.sortFloorList();
             elevator.move();
@@ -340,10 +340,10 @@ namespace Commercial_Controller
                 this.operateDoors("closed");
                 if(this.door.status == "closed")    // Check if the door dont' have any obstruction
                 {
-                    Console.WriteLine("Status door:" + this.door.status + "\n");
+                    //Console.WriteLine("Status door:" + this.door.status + "\n");
                     this.status = "moving";        //Changes the status of the elevator when it starts to move
                     this.screenDisplay = this.currentFloor;
-                    Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
+                    //Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
                     if(this.currentFloor < destination)
                     {
                         this.direction = "up";
@@ -353,7 +353,7 @@ namespace Commercial_Controller
                             if(this.currentFloor != 0)
                             {
                                 this.screenDisplay = this.currentFloor;
-                                Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
+                                //Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
                             }                            
                         }
                     }
@@ -364,13 +364,13 @@ namespace Commercial_Controller
                         {
                             this.currentFloor --;
                             this.screenDisplay = this.currentFloor;
-                            Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
+                            //Console.WriteLine("Elevator Status: " + this.status + " ||  Elevator Display: " + this.screenDisplay);
                         }
                     }
                     this.status = "stopped";        //Changes the status of the elevator when it reaches the correct floor
-                    Console.WriteLine("Elevator Status: " + this.status + "\n");
+                    //Console.WriteLine("Elevator Status: " + this.status + "\n");
                     this.operateDoors("openned");
-                    Console.WriteLine("Status door:" + this.door.status + "\n");
+                    //Console.WriteLine("Status door:" + this.door.status + "\n");
                 }
                 this.floorRequestList.RemoveAt(0);      //Removes the floor that has already been treated.
             }
@@ -395,7 +395,7 @@ namespace Commercial_Controller
                 this.door.status = _command;
             }else
             {
-                Console.WriteLine("Blocked door");
+                //Console.WriteLine("Blocked door");
             }
         }
     
@@ -416,10 +416,6 @@ namespace Commercial_Controller
             this.floor = _floor;
             this.direction = _direction;
         }
-
-        // public override string ToString() {
-        //     return this.ID + ", " + this.status + ", " + floor + ", " + direction;
-        // }
 
     }
 
@@ -475,44 +471,44 @@ namespace Commercial_Controller
         {
             Battery battery1 = null;
 
-            scenario1();
-            scenario2();
-            scenario3();
-            scenario4();
+            //scenario1();
+            //scenario2();
+            //scenario3();
+            //scenario4();
 
             //-------------------------------------"    Battery Initialization   "-------------------------------------
             void createBattery()
             {
                 battery1 = new Battery(1, 4, "OnLine", 60, 6, 5);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("=======================| Creating the Battery |=======================");
-                Console.ResetColor();
-                Console.WriteLine("New  Battery ID = " + battery1.ID + " || Status =  " + battery1.status + " || Number of Columns =  " + battery1.amountOfColumns + " || Number of Floors =  " + battery1.amountOfFloors + " || Number of Basements =  " + battery1.amountOfBasements);
-                Console.WriteLine("\n");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("==================| Creating the Columns |=======================");
-                Console.ResetColor();
-                foreach (Column column in battery1.columnsList)
-                {
-                    Console.WriteLine("Column: " + column.name + "  ||  " 
-                    + "Status: " + column.status 
-                    + " || Floors served =  " + String.Join(", ", column.servedFloors));
-                }           
-                Console.WriteLine("\n");
+                // Console.ForegroundColor = ConsoleColor.Yellow;
+                // Console.WriteLine("=======================| Creating the Battery |=======================");
+                // Console.ResetColor();
+                // Console.WriteLine("New  Battery ID = " + battery1.ID + " || Status =  " + battery1.status + " || Number of Columns =  " + battery1.amountOfColumns + " || Number of Floors =  " + battery1.amountOfFloors + " || Number of Basements =  " + battery1.amountOfBasements);
+                // Console.WriteLine("\n");
+                // Console.ForegroundColor = ConsoleColor.Yellow;
+                // Console.WriteLine("==================| Creating the Columns |=======================");
+                // Console.ResetColor();
+                // foreach (Column column in battery1.columnsList)
+                // {
+                //     Console.WriteLine("Column: " + column.name + "  ||  " 
+                //     + "Status: " + column.status 
+                //     + " || Floors served =  " + String.Join(", ", column.servedFloors));
+                // }           
+                // Console.WriteLine("\n");
             }
 
             //-------------------------------------"    Scenario 1   "-------------------------------------
             void scenario1()
             {              
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("=============================================| Scenario 1 |=============================================");
+                //Console.WriteLine("=============================================| Scenario 1 |=============================================");
                 Console.ForegroundColor = ConsoleColor.Yellow;                
                 Console.ResetColor();
                 Console.WriteLine("\n");
 
                 createBattery();
                 
-                Console.WriteLine("Someone at RC wants to go to the 20th floor");
+                //Console.WriteLine("Someone at RC wants to go to the 20th floor");
                 Console.WriteLine("\n");
 
                 battery1.columnsList[1].elevatorsList[0].direction = "down";
@@ -547,14 +543,14 @@ namespace Commercial_Controller
             void scenario2()
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("=============================================| Scenario 2 |=============================================");
+                //Console.WriteLine("=============================================| Scenario 2 |=============================================");
                 Console.ForegroundColor = ConsoleColor.Yellow;                
                 Console.ResetColor();
                 Console.WriteLine("\n");
 
                 createBattery(); 
 
-                Console.WriteLine("Someone at RC wants to go to the 36th floor");
+                //Console.WriteLine("Someone at RC wants to go to the 36th floor");
                 Console.WriteLine("\n");
 
                 battery1.columnsList[2].elevatorsList[0].direction = "up";
@@ -589,14 +585,14 @@ namespace Commercial_Controller
             void scenario3()
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("=============================================| Scenario 3 |=============================================");
+                //Console.WriteLine("=============================================| Scenario 3 |=============================================");
                 Console.ForegroundColor = ConsoleColor.Yellow;                
                 Console.ResetColor();
                 Console.WriteLine("\n");
 
                 createBattery();
                 
-                Console.WriteLine("Someone at 54e floor wants to go to RC");
+                //Console.WriteLine("Someone at 54e floor wants to go to RC");
                 Console.WriteLine("\n");
 
                 battery1.columnsList[3].elevatorsList[0].direction = "down";
@@ -631,14 +627,14 @@ namespace Commercial_Controller
             void scenario4()
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("=============================================| Scenario 4 |=============================================");
+                //Console.WriteLine("=============================================| Scenario 4 |=============================================");
                 Console.ForegroundColor = ConsoleColor.Yellow;                
                 Console.ResetColor();
                 Console.WriteLine("\n");
 
                 createBattery();
                 
-                Console.WriteLine("Someone at SS3 wants to go to RC");
+                //Console.WriteLine("Someone at SS3 wants to go to RC");
                 Console.WriteLine("\n");
 
                 battery1.columnsList[0].elevatorsList[0].status = "idle";
